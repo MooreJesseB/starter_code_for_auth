@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>User Home</title>
+  </head>
+  <body>
+    <h1>Welcome to your homepage <%= user.username %></h1>
+    <div>
+      <form action="/users/<%= user.id %>">
+        <input type="submit" value="View your blog posts">
+      </form>
+    </div>
+  </body>
+</html>

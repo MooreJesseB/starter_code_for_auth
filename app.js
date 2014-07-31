@@ -7,7 +7,7 @@ var express = require('express'),
   cookieSession = require('cookie-session'),
   flash = require('connect-flash'),
   app = express(),
-  db = require('./models/index.js'),;
+  db = require('./models/index.js');
 
 app.set('view engine', 'ejs');
 
@@ -30,7 +30,7 @@ passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
-passport.deserializer(function(id, done) {
+passport.deserializeUser(function(id, done) {
   console.log("DESERIALIZED RAN!");
   db.user.find({
     where: {
@@ -66,17 +66,21 @@ app.get('/signup', function(req, res) {
 
 app.get('/login', function(req, res) {
   if (!req.user) {
-    res.render("login")
+    res.render('login')
   } else {
     res.redirect('home')
   }
 });
 
 app.get('/home', function(req, res) {
-  res.render('home', {
+  if (!req.user) {
+    res.render('index')  ;
+  } else {
+    res.render('home', {
     isAuthenticated: req.isAuthenticated(),
     user: req.user
   });
+  }
 });
 
 app.post('/login', passport.authenticate('local', {
@@ -86,8 +90,12 @@ app.post('/login', passport.authenticate('local', {
 }));
 
 app.get('/logout', function(req, res) {
-  req.logout();
+  if (!req.user) {
+    res.render('index');
+  } else {
+    req.logout();
   res.redirect('/');
+  }
 });
 
 app.post('/create', function(req, res) {
@@ -99,27 +107,18 @@ app.post('/create', function(req, res) {
   });
 });
 
-app.get('/users', function (req,res) {
-  db.user.findAll().success(function(users) {
-    console.log(users);
-    res.render('users', {users: users});
-  });
-});
-
 app.get('/users/:id', function (req,res) {
-  db.user.find(req.params.id).success(function(user) {
-    console.log(user);
-    db.post.findAll({ where: {userId: req.params.id}}).success(function(posts) {
-      console.log(posts);
-      res.render('show_user', {user: user, posts: posts});
+  if (!req.user) {
+    res.render('index');
+  } else {
+    db.user.find(req.params.id).success(function(user) {
+      console.log(user);
+      db.post.findAll({ where: {userId: req.params.id}}).success(function(posts) {
+        console.log(posts);
+        res.render('show_user', {user: user, posts: posts});
+      });
     });
-  });
-});
-
-app.get('/posts/:id', function (req,res) {
-  var id = req.params.id;
-  //
-
+  }
 });
 
 app.get('/users/:id/posts/new', function(req, res){
@@ -135,7 +134,7 @@ app.post('/users/:id/posts', function(req, res){
     var post = db.post.create({title: req.body.title, body: req.body.body}).success(function(post){
       user.addPost(post).success(function(post) {
       console.log("TRYING TO ADD A NEW POST", post);
-      res.redirect('/users');  
+      res.redirect('/home')
       });
     });
   });
