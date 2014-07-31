@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Post</title>
+  </head>
+  <body>
+    <h1><%= user.username %></h1>
+    <div>
+      <h2>- Create New Post -</h2>
+      <form method="post" action="/users/<%=user.id%>/posts">
+        <input type="text" name="title" placeholder="Title"><br>
+        <input type="text" name="body" placeholder="Body"><br>
+        <input type="submit" value="Write New Post">
+      </form>
+    </div>
+  </body>
+</html>
