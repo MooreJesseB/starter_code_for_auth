@@ -6,9 +6,10 @@
   <body>
     <h1>Welcome to your homepage <%= user.username %></h1>
     <div>
-      <form action="/users/<%= user.id %>">
+      <form method="get" action="/users/<%= user.id %>">
         <input type="submit" value="View your blog posts">
       </form>
+      <form method="get" action="/logout">
     </div>
   </body>
 </html>
